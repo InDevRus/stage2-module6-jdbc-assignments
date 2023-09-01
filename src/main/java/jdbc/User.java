@@ -1,10 +1,8 @@
 package jdbc;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
+import java.sql.ResultSet;
 
 @Getter
 @Setter
@@ -16,4 +14,14 @@ public class User {
     private String firstName;
     private String lastName;
     private int age;
+
+    @SneakyThrows
+    static User fromResultSet(ResultSet resultSet) {
+        return new User(
+                resultSet.getLong("id"),
+                resultSet.getString("firstname"),
+                resultSet.getString("lastname"),
+                resultSet.getInt("age")
+        );
+    }
 }
