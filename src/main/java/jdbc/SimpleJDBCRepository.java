@@ -40,15 +40,7 @@ public class SimpleJDBCRepository {
     }
 
     @SneakyThrows
-    public Long createUser() {
-        long maxId;
-        try (var preparedStatement = connection.prepareStatement(findMaximumUserId)) {
-            maxId = preparedStatement.executeQuery().getLong("maxid");
-        }
-
-        var newUserId = Math.addExact(maxId, 1L);
-        var user = generateRandomUser(newUserId);
-
+    public Long createUser(User user) {
         try (var preparedStatement = connection.prepareStatement(createUserSQL)) {
             preparedStatement.setLong(1, user.getId());
             preparedStatement.setString(2, user.getFirstName());
@@ -57,32 +49,20 @@ public class SimpleJDBCRepository {
             preparedStatement.executeUpdate();
         }
 
-        return newUserId;
+        return user.getId();
     }
 
     @SneakyThrows
-    public User updateUser() {
-        var usersCount = countUsers();
-        var userNumber = ThreadLocalRandom.current().nextLong(0, usersCount);
-
-        User user;
-        try (var randomUserStatement = connection.prepareStatement(findUserByOffset)) {
-            randomUserStatement.setLong(1, userNumber);
-            var result = randomUserStatement.executeQuery();
-            result.next();
-            user = User.fromResultSet(result);
-        }
-
-        var newUser = generateRandomUser(user.getId());
+    public User updateUser(User user) {
         try (var updateRandomStatement = connection.prepareStatement(updateUserSQL)) {
-            updateRandomStatement.setString(1, newUser.getFirstName());
-            updateRandomStatement.setString(2, newUser.getLastName());
-            updateRandomStatement.setInt(3, newUser.getAge());
+            updateRandomStatement.setString(1, user.getFirstName());
+            updateRandomStatement.setString(2, user.getLastName());
+            updateRandomStatement.setInt(3, user.getAge());
             updateRandomStatement.setLong(4, user.getId());
             updateRandomStatement.executeUpdate();
         }
 
-        return newUser;
+        return user;
     }
 
     @SneakyThrows
@@ -131,7 +111,7 @@ public class SimpleJDBCRepository {
     }
 
     @SneakyThrows
-    private void deleteUser(Long userId) {
+    public void deleteUser(Long userId) {
         try (var statement = connection.prepareStatement(deleteUser)) {
             statement.setLong(1, userId);
             statement.executeUpdate();
