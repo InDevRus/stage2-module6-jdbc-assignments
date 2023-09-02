@@ -30,69 +30,75 @@ public class SimpleJDBCRepository {
 
     @SneakyThrows
     public Long createUser(User user) {
-        try (var creationStatement = dataSource.getConnection().prepareStatement(CREATE_USER_SQL)) {
-            creationStatement.setLong(1, user.getId());
-            creationStatement.setString(2, user.getFirstName());
-            creationStatement.setString(3, user.getLastName());
-            creationStatement.setInt(4, user.getAge());
-            creationStatement.executeUpdate();
-        }
-
-        return user.getId();
+        throw new UnsupportedOperationException();
+//        try (var creationStatement = dataSource.getConnection().prepareStatement(CREATE_USER_SQL)) {
+//            creationStatement.setLong(1, user.getId());
+//            creationStatement.setString(2, user.getFirstName());
+//            creationStatement.setString(3, user.getLastName());
+//            creationStatement.setInt(4, user.getAge());
+//            creationStatement.executeUpdate();
+//        }
+//
+//        return user.getId();
     }
 
     @SneakyThrows
     public User updateUser(User user) {
-        try (var updateRandomStatement = dataSource.getConnection().prepareStatement(UPDATE_USER_SQL)) {
-            updateRandomStatement.setString(1, user.getFirstName());
-            updateRandomStatement.setString(2, user.getLastName());
-            updateRandomStatement.setInt(3, user.getAge());
-            updateRandomStatement.setLong(4, user.getId());
-            updateRandomStatement.executeUpdate();
-        }
-
-        return user;
+        throw new UnsupportedOperationException();
+//        try (var updateRandomStatement = dataSource.getConnection().prepareStatement(UPDATE_USER_SQL)) {
+//            updateRandomStatement.setString(1, user.getFirstName());
+//            updateRandomStatement.setString(2, user.getLastName());
+//            updateRandomStatement.setInt(3, user.getAge());
+//            updateRandomStatement.setLong(4, user.getId());
+//            updateRandomStatement.executeUpdate();
+//        }
+//
+//        return user;
     }
 
     @SneakyThrows
     public User findUserById(Long userId) {
-        ResultSet result;
-        try (var findingStatement = dataSource.getConnection().prepareStatement(FIND_USER_BY_NAME_SQL)) {
-            findingStatement.setLong(1, userId);
-            result = findingStatement.executeQuery();
-        }
-        result.next();
-        return User.fromResultSet(result);
+        throw new UnsupportedOperationException();
+//        ResultSet result;
+//        try (var findingStatement = dataSource.getConnection().prepareStatement(FIND_USER_BY_NAME_SQL)) {
+//            findingStatement.setLong(1, userId);
+//            result = findingStatement.executeQuery();
+//        }
+//        result.next();
+//        return User.fromResultSet(result);
     }
 
     @SneakyThrows
     public User findUserByName(String userName) {
-        ResultSet result;
-        try (var findingStatement = dataSource.getConnection().prepareStatement(FIND_USER_BY_ID_SQL)) {
-            findingStatement.setString(1, userName);
-            result = findingStatement.executeQuery();
-        }
-        result.next();
-        return User.fromResultSet(result);
+        throw new UnsupportedOperationException();
+//        ResultSet result;
+//        try (var findingStatement = dataSource.getConnection().prepareStatement(FIND_USER_BY_ID_SQL)) {
+//            findingStatement.setString(1, userName);
+//            result = findingStatement.executeQuery();
+//        }
+//        result.next();
+//        return User.fromResultSet(result);
     }
 
     @SneakyThrows
     public List<User> findAllUser() {
-        ResultSet result;
-        try (var findingStatement = dataSource.getConnection().prepareStatement(FIND_ALL_USER_SQL)) {
-            result = findingStatement.executeQuery();
-        }
-        var foundUsers = new ArrayList<User>();
-        while (result.next()) {
-            foundUsers.add(User.fromResultSet(result));
-        }
-
-        return foundUsers;
+        throw new UnsupportedOperationException();
+//        ResultSet result;
+//        try (var findingStatement = dataSource.getConnection().prepareStatement(FIND_ALL_USER_SQL)) {
+//            result = findingStatement.executeQuery();
+//        }
+//        var foundUsers = new ArrayList<User>();
+//        while (result.next()) {
+//            foundUsers.add(User.fromResultSet(result));
+//        }
+//
+//        return foundUsers;
     }
 
     @SneakyThrows
     public void deleteUser(Long userId) {
-        try (var deletionStatement = dataSource.getConnection().prepareStatement(DELETE_USER)) {
+        try (var connection = dataSource.getConnection();
+             var deletionStatement = connection.prepareStatement(DELETE_USER)) {
             deletionStatement.setLong(1, userId);
             deletionStatement.executeUpdate();
         }
