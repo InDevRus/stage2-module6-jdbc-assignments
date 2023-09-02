@@ -60,7 +60,7 @@ public class SimpleJDBCRepository {
             findingStatement.setLong(1, userId);
             var result = findingStatement.executeQuery();
             result.next();
-            return User.fromResultSet(result);
+            return EntityDeserializer.toUser(result);
         }
     }
 
@@ -74,7 +74,7 @@ public class SimpleJDBCRepository {
             findingStatement.setString(1, userName);
             var result = findingStatement.executeQuery();
             result.next();
-            return User.fromResultSet(result);
+            return EntityDeserializer.toUser(result);
         }
 
     }
@@ -90,7 +90,7 @@ public class SimpleJDBCRepository {
             ResultSet result = findingStatement.executeQuery();
             var foundUsers = new ArrayList<User>();
             while (result.next()) {
-                foundUsers.add(User.fromResultSet(result));
+                foundUsers.add(EntityDeserializer.toUser(result));
             }
 
             return foundUsers;
