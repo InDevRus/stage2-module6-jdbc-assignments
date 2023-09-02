@@ -4,8 +4,6 @@ package jdbc;
 import lombok.*;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -13,15 +11,9 @@ import java.util.List;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 public class SimpleJDBCRepository {
-    private Connection connection = null;
-    private PreparedStatement preparedStatement = null;
-    private Statement statement = null;
-
     private final DataSource dataSource = CustomDataSource.getInstance();
-
 
     private static final String CREATE_USER_SQL = "insert into myusers (firstname, lastname, age) values (?, ?, ?);";
 
