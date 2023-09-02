@@ -15,9 +15,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SimpleJDBCRepository {
-    private final Connection connection = CustomDataSource.getInstance().getConnection();
-    private final PreparedStatement preparedStatement = null;
-    private final Statement statement = null;
+    private Connection connection = CustomDataSource.getInstance().getConnection();
+    private PreparedStatement preparedStatement = null;
+    private Statement statement = null;
 
     private static final String CREATE_USER_SQL = "insert into myusers (id, firstname, lastname, age) values (?, ?, ?, ?);";
     private static final String UPDATE_USER_SQL = "update myusers user set firstname = ?, lastname = ?, age = ? where id = ?";
@@ -26,7 +26,6 @@ public class SimpleJDBCRepository {
     private static final String FIND_USER_BY_NAME_SQL = "select id, firstname, lastname, age from myusers where firstname = ? limit 1";
     private static final String FIND_ALL_USER_SQL = "select id, firstname, lastname, age from myusers";
     private static final String FIND_MAXIMUM_USER_ID = "select max(id) as maxid from myusers";
-    private static final String COUNT_USERS = "select count(*) as count from myusers";
     private static final String FIND_USER_BY_OFFSET = "select id, firstname, lastname, age from myusers limit 1 offset ?";
 
     @SneakyThrows
@@ -89,15 +88,6 @@ public class SimpleJDBCRepository {
         }
 
         return foundUsers;
-    }
-
-    @SneakyThrows
-    private long countUsers() {
-        long count;
-        try (var countStatement = connection.prepareStatement(COUNT_USERS)) {
-            count = countStatement.executeQuery().getLong("count");
-        }
-        return count;
     }
 
     @SneakyThrows
