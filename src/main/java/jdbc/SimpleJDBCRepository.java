@@ -2,8 +2,6 @@ package jdbc;
 
 
 import lombok.*;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,42 +9,34 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class SimpleJDBCRepository {
-    private Connection connection = CustomDataSource.getInstance().getConnection();
-    private PreparedStatement preparedStatement = null;
-    private Statement statement = null;
+    private final Connection connection = CustomDataSource.getInstance().getConnection();
+    private final PreparedStatement preparedStatement = null;
+    private final Statement statement = null;
 
-    private static final String createUserSQL = "insert into myusers (id, firstname, lastname, age) values (?, ?, ?, ?);";
-    private static final String updateUserSQL = "update myusers user set firstname = ?, lastname = ?, age = ? where id = ?";
-    private static final String deleteUser = "delete from myusers where id = ?";
-    private static final String findUserByIdSQL = "select id, firstname, lastname, age from myusers where id = ?";
-    private static final String findUserByNameSQL = "select id, firstname, lastname, age from myusers where firstname = ? limit 1";
-    private static final String findAllUserSQL = "select id, firstname, lastname, age from myusers";
-    private static final String findMaximumUserId = "select max(id) as maxid from myusers";
-    private static final String countUsers = "select count(*) as count from myusers";
-    private static final String findUserByOffset = "select id, firstname, lastname, age from myusers limit 1 offset ?";
-
-    private static User generateRandomUser(long id) {
-        var randomFirstName = StringUtils.capitalize(RandomStringUtils.randomAlphabetic(4, 10).toLowerCase());
-        var randomLastName = StringUtils.capitalize(RandomStringUtils.randomAlphabetic(5, 10).toLowerCase());
-        var randomAge = ThreadLocalRandom.current().nextInt(12, 100);
-        return new User(id, randomFirstName, randomLastName, randomAge);
-    }
+    private static final String CREATE_USER_SQL = "insert into myusers (id, firstname, lastname, age) values (?, ?, ?, ?);";
+    private static final String UPDATE_USER_SQL = "update myusers user set firstname = ?, lastname = ?, age = ? where id = ?";
+    private static final String DELETE_USER = "delete from myusers where id = ?";
+    private static final String FIND_USER_BY_ID_SQL = "select id, firstname, lastname, age from myusers where id = ?";
+    private static final String FIND_USER_BY_NAME_SQL = "select id, firstname, lastname, age from myusers where firstname = ? limit 1";
+    private static final String FIND_ALL_USER_SQL = "select id, firstname, lastname, age from myusers";
+    private static final String FIND_MAXIMUM_USER_ID = "select max(id) as maxid from myusers";
+    private static final String COUNT_USERS = "select count(*) as count from myusers";
+    private static final String FIND_USER_BY_OFFSET = "select id, firstname, lastname, age from myusers limit 1 offset ?";
 
     @SneakyThrows
     public Long createUser(User user) {
-        try (var preparedStatement = connection.prepareStatement(createUserSQL)) {
-            preparedStatement.setLong(1, user.getId());
-            preparedStatement.setString(2, user.getFirstName());
-            preparedStatement.setString(3, user.getLastName());
-            preparedStatement.setInt(4, user.getAge());
-            preparedStatement.executeUpdate();
+        try (var creationStatement = connection.prepareStatement(CREATE_USER_SQL)) {
+            creationStatement.setLong(1, user.getId());
+            creationStatement.setString(2, user.getFirstName());
+            creationStatement.setString(3, user.getLastName());
+            creationStatement.setInt(4, user.getAge());
+            creationStatement.executeUpdate();
         }
 
         return user.getId();
@@ -54,7 +44,7 @@ public class SimpleJDBCRepository {
 
     @SneakyThrows
     public User updateUser(User user) {
-        try (var updateRandomStatement = connection.prepareStatement(updateUserSQL)) {
+        try (var updateRandomStatement = connection.prepareStatement(UPDATE_USER_SQL)) {
             updateRandomStatement.setString(1, user.getFirstName());
             updateRandomStatement.setString(2, user.getLastName());
             updateRandomStatement.setInt(3, user.getAge());
@@ -68,9 +58,9 @@ public class SimpleJDBCRepository {
     @SneakyThrows
     public User findUserById(Long userId) {
         ResultSet result;
-        try (var preparedStatement = connection.prepareStatement(findUserByNameSQL)) {
-            preparedStatement.setLong(1, userId);
-            result = preparedStatement.executeQuery();
+        try (var findingStatement = connection.prepareStatement(FIND_USER_BY_NAME_SQL)) {
+            findingStatement.setLong(1, userId);
+            result = findingStatement.executeQuery();
         }
         result.next();
         return User.fromResultSet(result);
@@ -79,9 +69,9 @@ public class SimpleJDBCRepository {
     @SneakyThrows
     public User findUserByName(String userName) {
         ResultSet result;
-        try (var preparedStatement = connection.prepareStatement(findUserByIdSQL)) {
-            preparedStatement.setString(1, userName);
-            result = preparedStatement.executeQuery();
+        try (var findingStatement = connection.prepareStatement(FIND_USER_BY_ID_SQL)) {
+            findingStatement.setString(1, userName);
+            result = findingStatement.executeQuery();
         }
         result.next();
         return User.fromResultSet(result);
@@ -90,8 +80,8 @@ public class SimpleJDBCRepository {
     @SneakyThrows
     public List<User> findAllUser() {
         ResultSet result;
-        try (var preparedStatement = connection.prepareStatement(findAllUserSQL)) {
-            result = preparedStatement.executeQuery();
+        try (var findingStatement = connection.prepareStatement(FIND_ALL_USER_SQL)) {
+            result = findingStatement.executeQuery();
         }
         var foundUsers = new ArrayList<User>();
         while (result.next()) {
@@ -104,17 +94,17 @@ public class SimpleJDBCRepository {
     @SneakyThrows
     private long countUsers() {
         long count;
-        try (var preparedStatement = connection.prepareStatement(countUsers)) {
-            count = preparedStatement.executeQuery().getLong("count");
+        try (var countStatement = connection.prepareStatement(COUNT_USERS)) {
+            count = countStatement.executeQuery().getLong("count");
         }
         return count;
     }
 
     @SneakyThrows
     public void deleteUser(Long userId) {
-        try (var statement = connection.prepareStatement(deleteUser)) {
-            statement.setLong(1, userId);
-            statement.executeUpdate();
+        try (var deletionStatement = connection.prepareStatement(DELETE_USER)) {
+            deletionStatement.setLong(1, userId);
+            deletionStatement.executeUpdate();
         }
     }
 }
