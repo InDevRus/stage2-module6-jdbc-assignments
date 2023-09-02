@@ -32,15 +32,16 @@ public class SimpleJDBCRepository {
     @SneakyThrows
     public Long createUser(User user) {
         try (var connection = dataSource.getConnection()) {
-            var creationStatement = connection.prepareStatement(CREATE_USER_SQL);
-            creationStatement.setLong(1, user.getId());
+            var creationStatement = connection.prepareStatement(CREATE_USER_SQL, Statement.RETURN_GENERATED_KEYS);
             creationStatement.setString(2, user.getFirstName());
             creationStatement.setString(3, user.getLastName());
             creationStatement.setInt(4, user.getAge());
             creationStatement.executeUpdate();
-        }
 
-        return user.getId();
+            var keys = creationStatement.getGeneratedKeys();
+            keys.next();
+            return keys.getLong(1);
+        }
     }
 
     @SuppressWarnings("unused")
