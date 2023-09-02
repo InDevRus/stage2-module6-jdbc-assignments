@@ -41,7 +41,7 @@ public class SimpleJDBCRepository {
         }
     }
 
-    private static final String UPDATE_USER_SQL = "update myusers user set firstname = ?, lastname = ?, age = ? where id = ?";
+    private static final String UPDATE_USER_SQL = "update myusers set firstname = ?, lastname = ?, age = ? where id = ?";
 
     @SuppressWarnings("unused")
     @SneakyThrows
