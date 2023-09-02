@@ -19,7 +19,7 @@ public class CustomDataSource implements DataSource {
         private static final CustomDataSource instance = new CustomDataSource(customConnector, propertiesLoader);
     }
 
-    private final String driver = "org.postgresql.Driver";
+    private final String driver;
     private final String url;
     private final String name;
     private final String password;
@@ -36,6 +36,7 @@ public class CustomDataSource implements DataSource {
         this.customConnector = customConnector;
         this.propertiesLoader = propertiesLoader;
 
+        this.driver = propertiesLoader.getByKey("postgres.driver");
         this.url = propertiesLoader.getByKey("postgres.url");
         this.name = propertiesLoader.getByKey("postgres.name");
         this.password = propertiesLoader.getByKey("postgres.password");
