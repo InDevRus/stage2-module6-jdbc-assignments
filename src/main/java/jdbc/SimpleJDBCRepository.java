@@ -28,8 +28,8 @@ public class SimpleJDBCRepository {
     @SuppressWarnings("unused")
     @SneakyThrows
     public Long createUser(User user) {
-        try (var currentCorrection = dataSource.getConnection()) {
-            var creationStatement = currentCorrection.prepareStatement(CREATE_USER_SQL, Statement.RETURN_GENERATED_KEYS);
+        try (var currentCorrection = dataSource.getConnection();
+             var creationStatement = currentCorrection.prepareStatement(CREATE_USER_SQL, Statement.RETURN_GENERATED_KEYS)) {
             creationStatement.setString(1, user.getFirstName());
             creationStatement.setString(2, user.getLastName());
             creationStatement.setInt(3, user.getAge());
@@ -46,8 +46,8 @@ public class SimpleJDBCRepository {
     @SuppressWarnings("unused")
     @SneakyThrows
     public User updateUser(User user) {
-        try (var currentConnection = dataSource.getConnection()) {
-            var updateRandomStatement = currentConnection.prepareStatement(UPDATE_USER_SQL);
+        try (var currentConnection = dataSource.getConnection();
+             var updateRandomStatement = currentConnection.prepareStatement(UPDATE_USER_SQL)) {
             updateRandomStatement.setString(1, user.getFirstName());
             updateRandomStatement.setString(2, user.getLastName());
             updateRandomStatement.setInt(3, user.getAge());
@@ -63,8 +63,8 @@ public class SimpleJDBCRepository {
     @SuppressWarnings("unused")
     @SneakyThrows
     public User findUserById(Long userId) {
-        try (var currentConnection = dataSource.getConnection()) {
-            var findingStatement = currentConnection.prepareStatement(FIND_USER_BY_ID_SQL);
+        try (var currentConnection = dataSource.getConnection();
+             var findingStatement = currentConnection.prepareStatement(FIND_USER_BY_ID_SQL)) {
             findingStatement.setLong(1, userId);
             var result = findingStatement.executeQuery();
             result.next();
@@ -77,8 +77,8 @@ public class SimpleJDBCRepository {
     @SuppressWarnings("unused")
     @SneakyThrows
     public User findUserByName(String userName) {
-        try (var currentConnection = dataSource.getConnection()) {
-            var findingStatement = currentConnection.prepareStatement(FIND_USER_BY_NAME_SQL);
+        try (var currentConnection = dataSource.getConnection();
+             var findingStatement = currentConnection.prepareStatement(FIND_USER_BY_NAME_SQL)) {
             findingStatement.setString(1, userName);
             var result = findingStatement.executeQuery();
             result.next();
@@ -92,8 +92,9 @@ public class SimpleJDBCRepository {
     @SuppressWarnings("unused")
     @SneakyThrows
     public List<User> findAllUser() {
-        try (var currentConnection = dataSource.getConnection()) {
-            var findingStatement = currentConnection.prepareStatement(FIND_ALL_USER_SQL);
+        try (var currentConnection = dataSource.getConnection();
+             var findingStatement = currentConnection.prepareStatement(FIND_ALL_USER_SQL)) {
+
             ResultSet result = findingStatement.executeQuery();
             var foundUsers = new ArrayList<User>();
             while (result.next()) {
