@@ -1,5 +1,7 @@
 package jdbc;
 
+import jdbc.loaders.AppPropertiesLoader;
+import jdbc.loaders.PropertiesLoader;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,13 +15,14 @@ import java.util.logging.Logger;
 public class CustomDataSource implements DataSource {
     private static class CustomDataSourceHolder {
         private static final CustomConnector customConnector = new CustomConnector();
-        private static final CustomDataSource instance = new CustomDataSource(customConnector);
+        private static final PropertiesLoader propertiesLoader = AppPropertiesLoader.getInstance();
+        private static final CustomDataSource instance = new CustomDataSource(customConnector, propertiesLoader);
     }
 
-    private final String driver = "org.postgresql.Driver";
-    private final String url = "jdbc:postgresql://localhost:5432/myfirstdb";
-    private final String name = "postgres";
-    private final String password = "";
+    private final String driver;
+    private final String url;
+    private final String name;
+    private final String password;
 
     private PrintWriter logWriter;
 
@@ -27,8 +30,16 @@ public class CustomDataSource implements DataSource {
 
     private final CustomConnector customConnector;
 
-    private CustomDataSource(CustomConnector customConnector) {
+    private final PropertiesLoader propertiesLoader;
+
+    private CustomDataSource(CustomConnector customConnector, PropertiesLoader propertiesLoader) {
         this.customConnector = customConnector;
+        this.propertiesLoader = propertiesLoader;
+
+        this.driver = propertiesLoader.getByKey("postgres.driver");
+        this.url = propertiesLoader.getByKey("postgres.url");
+        this.name = propertiesLoader.getByKey("postgres.name");
+        this.password = propertiesLoader.getByKey("postgres.password");
     }
 
     public static CustomDataSource getInstance() {
