@@ -3,6 +3,7 @@ package jdbc;
 
 import lombok.*;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,22 +16,21 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SimpleJDBCRepository {
-    private Connection connection = CustomDataSource.getInstance().getConnection();
+    private Connection connection = null;
     private PreparedStatement preparedStatement = null;
     private Statement statement = null;
 
+    private final DataSource dataSource = CustomDataSource.getInstance();
     private static final String CREATE_USER_SQL = "insert into myusers (id, firstname, lastname, age) values (?, ?, ?, ?);";
     private static final String UPDATE_USER_SQL = "update myusers user set firstname = ?, lastname = ?, age = ? where id = ?";
     private static final String DELETE_USER = "delete from myusers where id = ?";
     private static final String FIND_USER_BY_ID_SQL = "select id, firstname, lastname, age from myusers where id = ?";
     private static final String FIND_USER_BY_NAME_SQL = "select id, firstname, lastname, age from myusers where firstname = ? limit 1";
     private static final String FIND_ALL_USER_SQL = "select id, firstname, lastname, age from myusers";
-    private static final String FIND_MAXIMUM_USER_ID = "select max(id) as maxid from myusers";
-    private static final String FIND_USER_BY_OFFSET = "select id, firstname, lastname, age from myusers limit 1 offset ?";
 
     @SneakyThrows
     public Long createUser(User user) {
-        try (var creationStatement = connection.prepareStatement(CREATE_USER_SQL)) {
+        try (var creationStatement = dataSource.getConnection().prepareStatement(CREATE_USER_SQL)) {
             creationStatement.setLong(1, user.getId());
             creationStatement.setString(2, user.getFirstName());
             creationStatement.setString(3, user.getLastName());
@@ -43,7 +43,7 @@ public class SimpleJDBCRepository {
 
     @SneakyThrows
     public User updateUser(User user) {
-        try (var updateRandomStatement = connection.prepareStatement(UPDATE_USER_SQL)) {
+        try (var updateRandomStatement = dataSource.getConnection().prepareStatement(UPDATE_USER_SQL)) {
             updateRandomStatement.setString(1, user.getFirstName());
             updateRandomStatement.setString(2, user.getLastName());
             updateRandomStatement.setInt(3, user.getAge());
@@ -57,7 +57,7 @@ public class SimpleJDBCRepository {
     @SneakyThrows
     public User findUserById(Long userId) {
         ResultSet result;
-        try (var findingStatement = connection.prepareStatement(FIND_USER_BY_NAME_SQL)) {
+        try (var findingStatement = dataSource.getConnection().prepareStatement(FIND_USER_BY_NAME_SQL)) {
             findingStatement.setLong(1, userId);
             result = findingStatement.executeQuery();
         }
@@ -68,7 +68,7 @@ public class SimpleJDBCRepository {
     @SneakyThrows
     public User findUserByName(String userName) {
         ResultSet result;
-        try (var findingStatement = connection.prepareStatement(FIND_USER_BY_ID_SQL)) {
+        try (var findingStatement = dataSource.getConnection().prepareStatement(FIND_USER_BY_ID_SQL)) {
             findingStatement.setString(1, userName);
             result = findingStatement.executeQuery();
         }
@@ -79,7 +79,7 @@ public class SimpleJDBCRepository {
     @SneakyThrows
     public List<User> findAllUser() {
         ResultSet result;
-        try (var findingStatement = connection.prepareStatement(FIND_ALL_USER_SQL)) {
+        try (var findingStatement = dataSource.getConnection().prepareStatement(FIND_ALL_USER_SQL)) {
             result = findingStatement.executeQuery();
         }
         var foundUsers = new ArrayList<User>();
@@ -92,7 +92,7 @@ public class SimpleJDBCRepository {
 
     @SneakyThrows
     public void deleteUser(Long userId) {
-        try (var deletionStatement = connection.prepareStatement(DELETE_USER)) {
+        try (var deletionStatement = dataSource.getConnection().prepareStatement(DELETE_USER)) {
             deletionStatement.setLong(1, userId);
             deletionStatement.executeUpdate();
         }
