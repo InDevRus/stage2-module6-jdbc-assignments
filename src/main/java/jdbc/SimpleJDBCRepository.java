@@ -28,10 +28,11 @@ public class SimpleJDBCRepository {
     private static final String FIND_USER_BY_NAME_SQL = "select id, firstname, lastname, age from myusers where firstname = ? limit 1";
     private static final String FIND_ALL_USER_SQL = "select id, firstname, lastname, age from myusers";
 
+    @SuppressWarnings("unused")
     @SneakyThrows
     public Long createUser(User user) {
-        try (var connection = dataSource.getConnection();
-             var creationStatement = connection.prepareStatement(DELETE_USER)) {
+        try (var connection = dataSource.getConnection()) {
+            var creationStatement = connection.prepareStatement(CREATE_USER_SQL);
             creationStatement.setLong(1, user.getId());
             creationStatement.setString(2, user.getFirstName());
             creationStatement.setString(3, user.getLastName());
@@ -42,59 +43,62 @@ public class SimpleJDBCRepository {
         return user.getId();
     }
 
+    @SuppressWarnings("unused")
     @SneakyThrows
     public User updateUser(User user) {
-        throw new UnsupportedOperationException();
-//        try (var updateRandomStatement = dataSource.getConnection().prepareStatement(UPDATE_USER_SQL)) {
-//            updateRandomStatement.setString(1, user.getFirstName());
-//            updateRandomStatement.setString(2, user.getLastName());
-//            updateRandomStatement.setInt(3, user.getAge());
-//            updateRandomStatement.setLong(4, user.getId());
-//            updateRandomStatement.executeUpdate();
-//        }
-//
-//        return user;
+        try (var connection = dataSource.getConnection()) {
+            var updateRandomStatement = connection.prepareStatement(UPDATE_USER_SQL);
+            updateRandomStatement.setString(1, user.getFirstName());
+            updateRandomStatement.setString(2, user.getLastName());
+            updateRandomStatement.setInt(3, user.getAge());
+            updateRandomStatement.setLong(4, user.getId());
+            updateRandomStatement.executeUpdate();
+        }
+
+        return user;
     }
 
+    @SuppressWarnings("unused")
     @SneakyThrows
     public User findUserById(Long userId) {
-        throw new UnsupportedOperationException();
-//        ResultSet result;
-//        try (var findingStatement = dataSource.getConnection().prepareStatement(FIND_USER_BY_NAME_SQL)) {
-//            findingStatement.setLong(1, userId);
-//            result = findingStatement.executeQuery();
-//        }
-//        result.next();
-//        return User.fromResultSet(result);
+        try (var connection = dataSource.getConnection()) {
+            var findingStatement = connection.prepareStatement(FIND_USER_BY_NAME_SQL);
+            findingStatement.setLong(1, userId);
+            var result = findingStatement.executeQuery();
+            result.next();
+            return User.fromResultSet(result);
+        }
     }
 
+    @SuppressWarnings("unused")
     @SneakyThrows
     public User findUserByName(String userName) {
-        throw new UnsupportedOperationException();
-//        ResultSet result;
-//        try (var findingStatement = dataSource.getConnection().prepareStatement(FIND_USER_BY_ID_SQL)) {
-//            findingStatement.setString(1, userName);
-//            result = findingStatement.executeQuery();
-//        }
-//        result.next();
-//        return User.fromResultSet(result);
+        try (var connection = dataSource.getConnection()) {
+            var findingStatement = connection.prepareStatement(FIND_USER_BY_ID_SQL);
+            findingStatement.setString(1, userName);
+            var result = findingStatement.executeQuery();
+            result.next();
+            return User.fromResultSet(result);
+        }
+
     }
 
+    @SuppressWarnings("unused")
     @SneakyThrows
     public List<User> findAllUser() {
-        throw new UnsupportedOperationException();
-//        ResultSet result;
-//        try (var findingStatement = dataSource.getConnection().prepareStatement(FIND_ALL_USER_SQL)) {
-//            result = findingStatement.executeQuery();
-//        }
-//        var foundUsers = new ArrayList<User>();
-//        while (result.next()) {
-//            foundUsers.add(User.fromResultSet(result));
-//        }
-//
-//        return foundUsers;
+        try (var connection = dataSource.getConnection()) {
+            var findingStatement = connection.prepareStatement(FIND_ALL_USER_SQL);
+            ResultSet result = findingStatement.executeQuery();
+            var foundUsers = new ArrayList<User>();
+            while (result.next()) {
+                foundUsers.add(User.fromResultSet(result));
+            }
+
+            return foundUsers;
+        }
     }
 
+    @SuppressWarnings("unused")
     @SneakyThrows
     public void deleteUser(Long userId) {
         try (var connection = dataSource.getConnection();
