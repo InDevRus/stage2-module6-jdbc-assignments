@@ -30,16 +30,16 @@ public class SimpleJDBCRepository {
 
     @SneakyThrows
     public Long createUser(User user) {
-        throw new UnsupportedOperationException();
-//        try (var creationStatement = dataSource.getConnection().prepareStatement(CREATE_USER_SQL)) {
-//            creationStatement.setLong(1, user.getId());
-//            creationStatement.setString(2, user.getFirstName());
-//            creationStatement.setString(3, user.getLastName());
-//            creationStatement.setInt(4, user.getAge());
-//            creationStatement.executeUpdate();
-//        }
-//
-//        return user.getId();
+        try (var connection = dataSource.getConnection();
+             var creationStatement = connection.prepareStatement(DELETE_USER)) {
+            creationStatement.setLong(1, user.getId());
+            creationStatement.setString(2, user.getFirstName());
+            creationStatement.setString(3, user.getLastName());
+            creationStatement.setInt(4, user.getAge());
+            creationStatement.executeUpdate();
+        }
+
+        return user.getId();
     }
 
     @SneakyThrows
